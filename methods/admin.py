@@ -6,7 +6,7 @@ from decouple import config
 from django.conf import settings
 from static_files.lang import Language as lang
 from static_files.admin import MessageText as adm_msg
-from db.models import User, Channel, Admin, Category, Reklama
+from db.models import User, Channel, Admin, Category, Reklama, Question
 from keyboards.admin_keyboards import Button as adm_kb
 import telebot
 
@@ -20,6 +20,19 @@ def admin(update: Update, context: CallbackContext):
         update.message.reply_text(text=adm_msg.menu.get(lang.uz_latn).replace('%admin%', user.full_name),
                                   reply_markup=adm_kb.menu(lang.uz_latn))
         return st.admin
+
+
+def insert_data(update: Update, context: CallbackContext):
+    photo, caption = update.message.photo[-1].file_id, update.message.caption
+    key_a, key_b = caption.split(',')
+    Question.objects.create(
+        categories_a=key_a,
+        categories_b=key_b,
+        image_url=photo
+    )
+
+    update.message.reply_text(text="Ma'lumotlar bazasiga muvaffaqiyatli qo'shildi")
+    return st.help
 
 
 def back_user(update, context):
@@ -474,7 +487,7 @@ def del_admin(update, context):
 
 def add_channel(update: Update, context: CallbackContext):
     update.message.reply_html(adm_msg.add_channel_id.get(lang.uz_latn), reply_markup=adm_kb.back(lang.uz_latn))
-    return st.add_channel
+    return st.add_channel_n
 
 
 def add_channel_id(update: Update, context: CallbackContext):
@@ -486,7 +499,7 @@ def add_channel_id(update: Update, context: CallbackContext):
             "en": f"Siz kiritgan Channel ID: 🚫 <code>{channel_id}</code> Xato\n\n<b>Siz Channel ID raqamini kiritishingiz kerak edi </b>",
         }
         update.message.reply_html(channel_id_bug_txt.get('uz'))
-        return st.add_channel
+        return st.add_channel_n
     context.chat_data['channel_id'] = channel_id
     update.message.reply_html(adm_msg.add_channel_name.get(lang.uz_latn), reply_markup=adm_kb.back(lang.uz_latn))
     return st.add_channel_name
@@ -522,7 +535,7 @@ def add_channel_link(update: Update, context: CallbackContext):
 
 def status_channels(update, context):
     """Channels status update"""
-    data_channel = Channel.objects.all().values_list('pk', 'name', 'channel_id', 'channel_url', 'date_of_created', )
+    data_channel = Channel.objects.all()
     data_text = "Barcha kanallar ro'yxati bilan tanishing:\n\n"
     for item in data_channel:
         status_name = {True: "<code>✅ Aktiv</code>", False: "<code>❌ Passiv</code>"}

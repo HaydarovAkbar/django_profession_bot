@@ -7,6 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 import django
 
 django.setup()
+from db.models import *
 
 import logging
 from states import StatesBase as st
@@ -19,7 +20,8 @@ from static_files.lang import Language as lang
 from methods.admin import admin, reklama, back_user, reklama_type, get_button_link, \
     send_reklama_audio, send_reklama_voice, send_reklama_text, send_reklama_photo, send_reklama_video, \
     get_forward_message, get_not_link_batton, admin_stats, add_admin, get_new_admin_chat_id, admin_lists, del_admin, \
-    add_channel, add_channel_name, add_channel_link, status_channels, channel_status, status_edit_channel
+    add_channel, add_channel_name, add_channel_link, status_channels, channel_status, status_edit_channel, insert_data, \
+    add_channel_id
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -132,7 +134,18 @@ bot_handler = ConversationHandler(
                            back_user),
             MessageHandler(Filters.text, del_admin),
         ],
-        st.add_channel: [
+        st.add_channel_n: [
+            CommandHandler('start', start),
+            CommandHandler('admin', admin),
+            MessageHandler(Filters.regex('^(' + adm_msg.back[lang.uz_latn] + ')$'),
+                           back_user),
+            MessageHandler(Filters.regex('^(' + adm_msg.back[lang.uz_cyrl] + ')$'),
+                           back_user),
+            MessageHandler(Filters.regex('^(' + adm_msg.back[lang.ru] + ')$'),
+                           back_user),
+            MessageHandler(Filters.text, add_channel_id),
+        ],
+        st.add_channel_name: [
             CommandHandler('start', start),
             CommandHandler('admin', admin),
             MessageHandler(Filters.regex('^(' + adm_msg.back[lang.uz_latn] + ')$'),
@@ -143,7 +156,8 @@ bot_handler = ConversationHandler(
                            back_user),
             MessageHandler(Filters.text, add_channel_name),
         ],
-        st.add_channel_name: [
+
+        st.add_channel_link: [
             CommandHandler('start', start),
             CommandHandler('admin', admin),
             MessageHandler(Filters.regex('^(' + adm_msg.back[lang.uz_latn] + ')$'),
@@ -176,6 +190,9 @@ bot_handler = ConversationHandler(
 
             MessageHandler(Filters.text, channel_status),
         ],
+        st.help: [
+            MessageHandler(Filters.photo, insert_data)
+        ]
     },
     fallbacks=[CommandHandler('cancel', start)]
 )

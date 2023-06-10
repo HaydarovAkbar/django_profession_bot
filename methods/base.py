@@ -22,7 +22,7 @@ def start(update: Update, context: CallbackContext):
 def get_user_old(update: Update, context: CallbackContext):
     user_age = update.message.text
     if not user_age.isdigit() or int(user_age) < 0 or int(user_age) > 100:
-        update.message.reply_text(text=err.age_error_txt.get(lang.uz_latn))
+        update.message.reply_html(text=err.age_error_txt.get(lang.uz_latn))
         return st.age
     context.chat_data['age'] = user_age
     update.message.reply_text(text=msg.enter_gender_txt.get(lang.uz_latn), reply_markup=kb.gender(lang.uz_latn))
