@@ -11,6 +11,7 @@ except Exception:
 class User(models.Model):
     fullname = models.CharField(max_length=50, default="Dan")
     chat_id = models.CharField(max_length=25, default="123456789")
+    username = models.CharField(max_length=50, null=True)
     age = models.IntegerField(default=0)
     gender = models.CharField(default='male', max_length=10)
     language_code = models.CharField(max_length=10, default=lang.uz_latn)
@@ -55,6 +56,8 @@ class Admin(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    key = models.CharField(max_length=1)
+    image_url = models.URLField(max_length=200, blank=True)
     owner_id = models.ForeignKey(Admin, on_delete=models.CASCADE)
     date_of_created = models.DateTimeField(auto_now_add=True)
 
@@ -69,10 +72,10 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    question = models.CharField(max_length=250)
+    categories_a = models.CharField(max_length=1)
+    categories_b = models.CharField(max_length=1)
+    image_url = models.URLField(max_length=200, blank=True)
     date_of_created = models.DateTimeField(auto_now_add=True)
-    photo_url = models.URLField(max_length=200, blank=True)
-    categories = models.ManyToManyField(Category, related_name='questions')
 
     class Meta:
         verbose_name = 'Question'
@@ -81,13 +84,13 @@ class Question(models.Model):
         db_table = 'questions'
 
     def __str__(self):
-        return self.question
+        return f'test id- {self.pk}'
 
 
 class Answer(models.Model):
     answer = models.CharField(max_length=250)
     date_of_created = models.DateTimeField(auto_now_add=True)
-    photo_url = models.URLField(max_length=200, blank=True)
+    image_url = models.URLField(max_length=200, blank=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     class Meta:
@@ -103,11 +106,43 @@ class Answer(models.Model):
 class Channel(models.Model):
     channel_id = models.CharField(max_length=25)
     name = models.CharField(max_length=50)
+    channel_url = models.URLField(max_length=50)
     date_of_created = models.DateTimeField(auto_now_add=True)
     owner_id = models.ForeignKey(Admin, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = 'Channel'
         verbose_name_plural = 'Channels'
         ordering = ['-date_of_created']
         db_table = 'channels'
+
+
+class UserResult(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    date_of_created = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'UserResult'
+        verbose_name_plural = 'UserResults'
+        ordering = ['-date_of_created']
+        db_table = 'user_result'
+
+    def __str__(self):
+        return self.user.fullname
+
+
+class Reklama(models.Model):
+    date_of_created = models.DateTimeField(auto_now_add=True)
+    owner_id = models.ForeignKey(Admin, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    send_user = models.IntegerField(default=0)
+    aktiv_user = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Reklama'
+        verbose_name_plural = 'Reklamas'
+        ordering = ['-date_of_created']
+        db_table = 'reklama'
