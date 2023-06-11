@@ -122,6 +122,7 @@ class UserResult(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_of_created = models.DateTimeField(auto_now_add=True)
+    like = models.CharField(max_length=30, null=True)
     status = models.BooleanField(default=False)
 
     class Meta:
@@ -146,3 +147,18 @@ class Reklama(models.Model):
         verbose_name_plural = 'Reklamas'
         ordering = ['-date_of_created']
         db_table = 'reklama'
+
+
+class TestEvaluation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    gradge = models.IntegerField(default=0)
+    date_of_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'TestEvaluation'
+        verbose_name_plural = 'TestEvaluations'
+        ordering = ['-date_of_created']
+        db_table = 'test_evaluation'
+
+    def __str__(self):
+        return self.user.fullname
