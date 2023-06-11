@@ -122,6 +122,7 @@ def get_result(update: Update, context: CallbackContext):
                              parse_mode='HTML',
                              reply_markup=ReplyKeyboardRemove())
     direction_count = len(msg.all_jobs_helper.get(result_category.key))
+    time.sleep(2)
     context.bot.send_message(chat_id=user.id,
                              text=msg.choose_profession.get(lang.uz_latn),
                              parse_mode='HTML',
@@ -150,12 +151,11 @@ def get_number(update: Update, context: CallbackContext):
 def test_like(update: Update, context: CallbackContext):
     user = update.effective_user
     query = update.callback_query
-    context.chat_data['number'] = query.data
-    query.delete_message(timeout=1)
     TestEvaluation.objects.create(
         user=User.objects.get(chat_id=user.id),
         gradge=query.data
     )
+
     query.delete_message(timeout=1)
     context.bot.send_message(chat_id=user.id,
                              text=msg.choose_menu.get(lang.uz_latn),
