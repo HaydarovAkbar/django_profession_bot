@@ -4,6 +4,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from states.states_basic import StatesBase as stb
 from keyboards.base_keyboards import BaseKeyboards as kyb
 from static_files.lang import Language as lang
+from static_files.base_message import MessageText as msg
 from settings import TOKEN
 import telebot
 
@@ -52,6 +53,6 @@ def check_is_subscribed(update: Update, context: CallbackContext):
             query.delete_message(timeout=1)
             return is_not_subscribed(update, context)
         query.delete_message(timeout=1)
-        context.bot.send_message(chat_id=user.id, text="<b> Botdan foydalanishingiz mumkin 👇</b>",
+        context.bot.send_message(chat_id=user.id, text=msg.start_test.get(lang.uz_latn),
                                  parse_mode="HTML", reply_markup=kyb.base(lang.uz_latn))
-        return stb.base
+        return stb.menu

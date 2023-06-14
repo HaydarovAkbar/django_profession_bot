@@ -7,7 +7,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 import django
 
 django.setup()
-from db.models import *
 
 import logging
 from states import StatesBase as st
@@ -27,7 +26,7 @@ from methods.admin import admin, reklama, back_user, reklama_type, get_button_li
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-updater = Updater(TOKEN, use_context=True)
+updater = Updater(TOKEN, use_context=True, workers=3200, request_kwargs={'read_timeout': 1000, 'connect_timeout': 1000})
 
 dp = updater.dispatcher
 bot_handler = ConversationHandler(

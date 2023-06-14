@@ -13,7 +13,6 @@ import random
 def start(update: Update, context: CallbackContext):
     user = update.effective_user
     User.objects.get_or_create(chat_id=user.id)
-    update.message.reply_text("salom", reply_markup=kb.number(10))
     update.message.reply_text(text=msg.base_txt.get(lang.uz_latn).replace('%fullname%', user.full_name))
     update.message.reply_text(text=msg.first_question_txt.get(lang.uz_latn), reply_markup=kb.age(lang.uz_latn))
     return st.age
@@ -41,12 +40,12 @@ def get_user_gender(update: Update, context: CallbackContext):
         )
     context.chat_data['gender'] = query.data
     query.delete_message(timeout=1)
-    # channels = Channel.objects.filter(status=True)
-    # is_subscribed_ = is_subscribed(channels, user.id)
-    # if is_subscribed_ is False:
-    #     time.sleep(0.7)
-    #     return is_not_subscribed(update, context)
-    context.bot.send_message(chat_id=user.id, text=msg.menu.get(lang.uz_latn),
+    channels = Channel.objects.filter(status=True)
+    is_subscribed_ = is_subscribed(channels, user.id)
+    if is_subscribed_ is False:
+        time.sleep(0.7)
+        return is_not_subscribed(update, context)
+    context.bot.send_message(chat_id=user.id, text=msg.start_test.get(lang.uz_latn),
                              parse_mode='HTML',
                              reply_markup=kb.base(lang.uz_latn))
     return st.menu
@@ -59,15 +58,15 @@ def start_test(update: Update, context: CallbackContext):
     if is_subscribed_ is False:
         time.sleep(0.7)
         return is_not_subscribed(update, context)
-    del_msg = update.message.reply_text(text=msg.start_test.get(lang.uz_latn), reply_markup=ReplyKeyboardRemove())
-    del_msg.delete(timeout=1)
-    questions = Question.objects.all()
+    del_msg = update.message.reply_text(text=msg.menu.get(lang.uz_latn), reply_markup=ReplyKeyboardRemove())
+    del_msg.delete(timeout=0.3)
+    questions = Question.objects.all().order_by('id')
     question_list = list(questions)
-    random.shuffle(question_list)
     context.chat_data['questions'], context.chat_data['counter'] = question_list, 0
     first_question = question_list[0]
     keyboard = kb.question(first_question.categories_a, first_question.categories_b)
-    context.bot.send_photo(chat_id=user.id, photo=first_question.image_url, caption=msg.test.get(lang.uz_latn),
+    context.bot.send_photo(chat_id=user.id, photo=first_question.image_url,
+                           caption="(1/21) " + msg.test.get(lang.uz_latn),
                            reply_markup=keyboard)
     return st.test
 
@@ -86,15 +85,16 @@ def get_test(update: Update, context: CallbackContext):
         context.chat_data[query.data] += 1
     else:
         context.chat_data[query.data] = 1
-    time.sleep(0.4)
-    query.delete_message(timeout=1)
+    time.sleep(0.1)
+    query.delete_message(timeout=0.3)
     if counter == len(questions) - 1:
         return get_result(update, context)
     counter += 1
     context.chat_data['counter'] = counter
     question = questions[counter]
     keyboard = kb.question(question.categories_a, question.categories_b)
-    context.bot.send_photo(chat_id=user.id, photo=question.image_url, caption=msg.test.get(lang.uz_latn),
+    context.bot.send_photo(chat_id=user.id, photo=question.image_url,
+                           caption=f"({counter + 1}/21) " + msg.test.get(lang.uz_latn),
                            reply_markup=keyboard)
     return st.test
 
@@ -137,7 +137,7 @@ def get_number(update: Update, context: CallbackContext):
     context.chat_data['number'] = query.data
     user_result = UserResult.objects.filter(user=User.objects.get(chat_id=user.id)).order_by('-date_of_created')[0]
     category_key = context.chat_data['category_key']
-    user_result.number = msg.all_jobs_helper.get(category_key)[query.data - 1]
+    user_result.number = msg.all_jobs_helper.get(category_key)[int(query.data) - 1]
     user_result.save()
     query.delete_message(timeout=1)
     time.sleep(2)

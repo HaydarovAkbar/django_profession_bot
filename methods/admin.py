@@ -6,9 +6,10 @@ from decouple import config
 from django.conf import settings
 from static_files.lang import Language as lang
 from static_files.admin import MessageText as adm_msg
-from db.models import User, Channel, Admin, Category, Reklama, Question
+from db.models import User, Channel, Admin, Reklama, Question, TestEvaluation
 from keyboards.admin_keyboards import Button as adm_kb
 import telebot
+from django.db.models import Sum
 
 bot_help = telebot.TeleBot(settings.TOKEN)
 status_number = int(config('NUMBER_OF_USERS'))
@@ -109,7 +110,7 @@ def send_aktiv_user_to_admins(update: Update, context: CallbackContext):
             send_user=all_count,
             aktiv_user=aktiv_count,
         )
-    return st.menu
+    return st.admin
 
 
 def send_reklama_text(update: Update, context: CallbackContext):
@@ -395,7 +396,7 @@ def get_forward_message(update: Update, context: CallbackContext):
     except Exception:
         context.bot.send_message(chat_id=update.effective_user.id,
                                  text="❗️ Xabar yuborilmadi\n\nSababi forward xabar yuborish uchun bot kanalda admin bo'lishi kerak!!!")
-        return st.menu
+        return st.admin
     context.bot.send_message(chat_id=update.effective_user.id,
                              text=f"Xabar yuborilmoqda...\n\nBiroz kuting har {status_number} ta foydalanuvchiga yuborib bo'lib statistika jo'natiladi!")
     context.chat_data['ended'] = False
@@ -423,18 +424,25 @@ def get_forward_message(update: Update, context: CallbackContext):
 
 def admin_stats(update: Update, context: CallbackContext):
     user_count = User.objects.all().count()
-    aktiv_count = Reklama.objects.last().aktiv_count
-    stats_msg = f"""Botning statistikasi:\n\n
-👤 Foydalanuvchilar soni: {user_count}
+    aktiv_count = Reklama.objects.last()
+    aktiv_count = aktiv_count.aktiv_user if not aktiv_count is None else 0
+    count = TestEvaluation.objects.all().count()
+    grade_ = TestEvaluation.objects.aggregate(total_grade=Sum('gradge'))['total_grade']
+    result = (grade_ / 10) / count * 100
+    man, famale = User.objects.filter(gender='male').count(), User.objects.filter(gender='famale').count()
+    stats_msg = f"""📈 <b>Botning statistikasi:\n
+👤 Foydalanuvchilar soni: <code>{user_count}</code>
+     Erkaklar: <code>{man}</code>,  Ayollar: <code>{famale}</code>
 
-🕓 Oxirgi reklama natijasiga ko'ra:
+🧑‍🦲 Aktiv foydalanuvchilar soni: <code>{aktiv_count}</code>
 
-🧑‍🦲 Aktiv foydalanuvchilar soni: {aktiv_count}
+📊 Umumiy ball: <code>{round(result, 2)}</code>%</b>
 """
     context.bot.send_message(chat_id=update.effective_user.id,
                              text=stats_msg,
+                             parse_mode='HTML',
                              reply_markup=adm_kb.menu(lang.uz_latn))
-    return st.menu
+    return st.admin
 
 
 # Admin qo'shish funkisayalari
@@ -454,7 +462,7 @@ def get_new_admin_chat_id(update, context):
         pass
     update.message.reply_html(text=adm_msg.success.get(lang.uz_latn),
                               reply_markup=adm_kb.menu(lang.uz_latn))
-    return st.menu
+    return st.admin
 
 
 def admin_lists(update, context):
@@ -482,7 +490,7 @@ def del_admin(update, context):
         except Exception:
             update.message.reply_html(text=adm_msg.continue_msg.get(lang.uz_latn),
                                       reply_markup=adm_kb.menu(lang.uz_latn))
-    return st.menu
+    return st.admin
 
 
 def add_channel(update: Update, context: CallbackContext):
@@ -530,7 +538,7 @@ def add_channel_link(update: Update, context: CallbackContext):
         owner_id=Admin.objects.get(chat_id=update.message.from_user.id)
     )
     update.message.reply_html(adm_msg.add_channel_succesfuly.get(lang.uz_latn), reply_markup=adm_kb.back(lang.uz_latn))
-    return st.menu
+    return st.admin
 
 
 def status_channels(update, context):
@@ -568,4 +576,4 @@ def status_edit_channel(update: Update, context: CallbackContext):
                                   reply_markup=adm_kb.back(lang.uz_latn))
     except Channel.DoesNotExist:
         update.message.reply_html(adm_msg.continue_msg.get(lang.uz_latn))
-    return st.menu
+    return st.admin
