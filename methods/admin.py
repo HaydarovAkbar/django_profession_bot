@@ -436,7 +436,7 @@ def admin_stats(update: Update, context: CallbackContext):
 
 🧑‍🦲 Aktiv foydalanuvchilar soni: <code>{aktiv_count}</code>
 
-📊 Umumiy ball: <code>{round(result, 2)}</code>%</b>
+📊 Umumiy ball: <code>{round(result, 2)} %</code></b>
 """
     context.bot.send_message(chat_id=update.effective_user.id,
                              text=stats_msg,
@@ -547,7 +547,7 @@ def status_channels(update, context):
     data_text = "Barcha kanallar ro'yxati bilan tanishing:\n\n"
     for item in data_channel:
         status_name = {True: "<code>✅ Aktiv</code>", False: "<code>❌ Passiv</code>"}
-        data_text += f"N: {item.id}). <code>NAME</code>: {item.name} <code>ID</code>: {item.channel_id}\n <code>DATE</code> {item.date_of_created} 🔹 <code>STATUS</code>: {status_name.get(item.status, 'nomalum')}\n"
+        data_text += f"N: {item.id}). <code>NAME</code>: {item.name} <code>ID</code>: {item.channel_id}\n <code>DATE</code> {item.date_of_created.strftime('%d.%m.%Y %H:%M')} 🔹 <code>STATUS</code>: {status_name.get(item.status, 'nomalum')}\n"
     update.message.reply_html(data_text)
     update.message.reply_html(adm_msg.channel_status_text.get(lang.uz_latn), reply_markup=adm_kb.back(lang.uz_latn))
     return st.status_channel

@@ -77,7 +77,7 @@ class MessageText:
         "en": "<b> Kanal nomini kiriting (Yani foydalanuvchi qismiga ko'rinib turadgan qismi) </b>",
     }
     add_channel_url = {
-        "uz": "<b> Kanal linkini kiriting (Yani foydalanuvchi link orqali o'tadigan qismi <code>https://t.me/HaydarovAkbar</code>) </b>",
+        "uz_latn": "<b> Kanal linkini kiriting (Yani foydalanuvchi link orqali o'tadigan qismi <code>https://t.me/HaydarovAkbar</code>) </b>",
         "ru": "<b> Kanal linkini kiriting (Yani foydalanuvchi link orqali o'tadigan qismi <code>https://t.me/HaydarovAkbar</code>) </b>",
         "en": "<b> Kanal linkini kiriting (Yani foydalanuvchi link orqali o'tadigan qismi <code>https://t.me/HaydarovAkbar</code>) </b>",
     }
@@ -89,12 +89,12 @@ class MessageText:
     }
 
     channel_status_text = {
-        "uz": "<b> Kanallar sozlamari\n\n1️⃣. Kanal tartib raqami yoki ID sini kiriting\n2️⃣. Tanlangan kanal sozlamari bilan tanishing</b>",
+        "uz_latn": "<b> Kanallar sozlamari\n\n1️⃣. Kanal tartib raqami yoki ID sini kiriting\n2️⃣. Tanlangan kanal sozlamari bilan tanishing</b>",
         "ru": "<b> Kanallar sozlamari\n\n1️⃣. Kanal tartib raqami yoki ID sini kiriting\n2️⃣. Tanlangan kanal sozlamari bilan tanishing </b>",
         "en": "<b> Kanallar sozlamari\n\n1️⃣. Kanal tartib raqami yoki ID sini kiriting\n2️⃣. Tanlangan kanal sozlamari bilan tanishing </b>",
     }
     update_channel_data_succesfuly = {
-        "uz": "<b> Kanal ma'lumotlari o'zgartirildi </b>",
+        "uz_latn": "<b> Kanal ma'lumotlari o'zgartirildi </b>",
         "ru": "<b> Kanal ma'lumotlari o'zgartirildi </b>",
         "en": "<b> Kanal ma'lumotlari o'zgartirildi </b>",
     }

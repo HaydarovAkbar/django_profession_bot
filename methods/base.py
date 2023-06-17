@@ -12,7 +12,6 @@ import random
 
 def start(update: Update, context: CallbackContext):
     user = update.effective_user
-    User.objects.get_or_create(chat_id=user.id)
     update.message.reply_text(text=msg.base_txt.get(lang.uz_latn).replace('%fullname%', user.full_name))
     update.message.reply_text(text=msg.first_question_txt.get(lang.uz_latn), reply_markup=kb.age(lang.uz_latn))
     return st.age
@@ -38,6 +37,13 @@ def get_user_gender(update: Update, context: CallbackContext):
             age=context.chat_data['age'],
             gender=query.data
         )
+    else:
+        user_db = User.objects.get(chat_id=user.id)
+        user_db.age = context.chat_data['age']
+        user_db.gender = query.data
+        user_db.fullname = user.full_name
+        user_db.username = user.username
+        user_db.save()
     context.chat_data['gender'] = query.data
     query.delete_message(timeout=1)
     channels = Channel.objects.filter(status=True)
